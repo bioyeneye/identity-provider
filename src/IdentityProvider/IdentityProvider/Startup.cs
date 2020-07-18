@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using IdentityProvider.Models;
+using IdentityProvider.Services.User;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using Microsoft.AspNetCore.Builder;
@@ -58,7 +59,9 @@ namespace IdentityProvider
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+
             IIdentityServerBuilder ids = services.AddIdentityServer()
+                .AddCustomUserStore()
                 .AddDeveloperSigningCredential();
 
             // EF client, scope, and persisted grant stores

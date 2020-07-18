@@ -1,32 +1,66 @@
+using System;
+using System.Security.Claims;
+using System.Security.Policy;
+using System.Threading.Tasks;
+using IdentityServer4.Events;
+using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace IdentityProvider.Services.User
 {
     public interface IUserRepository
     {
-        bool ValidateCredentials(string username, string password);
+        Task<bool> ValidateCredentials(string username, string password);
 
-        IdentityUser FindBySubjectId(string subjectId);
+        Task<IdentityUser> FindBySubjectId(string subjectId);
 
-        IdentityUser FindByUsername(string username);
+        Task<IdentityUser> FindByUsername(string username);
+
+        Task<bool> ValidatePassword(IdentityUser user, string password);
     }
     
     public class UserRepository : IUserRepository
     {
-        
-        public bool ValidateCredentials(string username, string password)
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly IEventService _events;
+        public UserRepository(UserManager<IdentityUser> userManager, IEventService events)
         {
-            throw new System.NotImplementedException();
+            _userManager = userManager;
+            _events = events;
         }
 
-        public IdentityUser FindBySubjectId(string subjectId)
+        public async Task<bool> ValidateCredentials(string username, string password)
         {
-            throw new System.NotImplementedException();
+            var user = await _userManager.FindByNameAsync(username);
+            if (user != null && await _userManager.CheckPasswordAsync(user, password))
+            {
+                await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.UserName));
+                return true;
+            }
+
+            return false;
         }
 
-        public IdentityUser FindByUsername(string username)
+        public async Task<IdentityUser> FindBySubjectId(string subjectId)
         {
-            throw new System.NotImplementedException();
+            return await _userManager.FindByIdAsync(subjectId);
+        }
+
+        public async Task<IdentityUser> FindByUsername(string username)
+        {
+            return await _userManager.FindByNameAsync(username);
+        }
+
+        public async Task<bool> ValidatePassword(IdentityUser user, string password)
+        {
+            if (user != null && await _userManager.CheckPasswordAsync(user, password))
+            {
+                return true;
+            }
+            
+            return false;
         }
     }
 }

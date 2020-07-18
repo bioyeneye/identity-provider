@@ -101,12 +101,12 @@ namespace IdentityProvider
                 new TestUser
                 {
                     SubjectId = "5BE86359-073C-434B-AD2D-A3932222DABE",
-                    Username = "folakemi",
-                    Password = "password",
+                    Username = "simisola@identity.com",
+                    Password = "Password1@",
                     IsActive = true,
                     Claims = new List<Claim>
                     {
-                        new Claim(JwtClaimTypes.Email, "folakemi@fudoora.com"),
+                        new Claim(JwtClaimTypes.Email, "simisola@identity.com"),
                         new Claim(JwtClaimTypes.Role, "admin")
                     }
                 }

@@ -6,7 +6,7 @@ namespace IdentityProvider.Services.User
     {
         public static IIdentityServerBuilder AddCustomUserStore(this IIdentityServerBuilder builder)
         {
-            builder.Services.AddSingleton<IUserRepository, UserRepository>();
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
             builder.AddProfileService<CustomProfileService>();
             builder.AddResourceOwnerValidator<CustomResourceOwnerPasswordValidator>();
             return builder;
