@@ -36,15 +36,14 @@ namespace IdentityProvider
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             IdentityModelEventSource.ShowPII = true;
-            
+
             services.AddControllers();
             services.AddCors();
-            
+
             var connectionString = Configuration.GetConnectionString("IdentityDbContext");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddDbContext<ApplicationDbContext>(builder =>
-                builder.UseSqlServer(connectionString, sqlOptions => sqlOptions.MigrationsAssembly(migrationsAssembly)));
+            services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer(connectionString, sqlOptions => sqlOptions.MigrationsAssembly(migrationsAssembly)));
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
                 {
                     options.Password.RequireDigit = true;
@@ -58,10 +57,10 @@ namespace IdentityProvider
                 })
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            
+
             IIdentityServerBuilder ids = services.AddIdentityServer()
                 .AddDeveloperSigningCredential();
-            
+
             // EF client, scope, and persisted grant stores
             ids.AddOperationalStore(options =>
                     options.ConfigureDbContext = builder =>
@@ -69,7 +68,7 @@ namespace IdentityProvider
                 .AddConfigurationStore(options =>
                     options.ConfigureDbContext = builder =>
                         builder.UseSqlServer(connectionString, sqlOptions => sqlOptions.MigrationsAssembly(migrationsAssembly)));
-            
+
             // ASP.NET Identity integration
             ids.AddAspNetIdentity<IdentityUser>();
         }
@@ -81,7 +80,7 @@ namespace IdentityProvider
             {
                 app.UseDeveloperExceptionPage();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             var forwardOptions = new ForwardedHeadersOptions
@@ -94,7 +93,7 @@ namespace IdentityProvider
             forwardOptions.KnownProxies.Clear();
             app.UseForwardedHeaders(forwardOptions);
 
-            
+
             InitializeDbTestData(app);
 
             app.UseRouting();
@@ -106,7 +105,7 @@ namespace IdentityProvider
 
             app.UseWelcomePage();
         }
-        
+
         private static void InitializeDbTestData(IApplicationBuilder app)
         {
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
@@ -123,6 +122,7 @@ namespace IdentityProvider
                     {
                         context.Clients.Add(client.ToEntity());
                     }
+
                     context.SaveChanges();
                 }
 
@@ -132,6 +132,7 @@ namespace IdentityProvider
                     {
                         context.IdentityResources.Add(resource.ToEntity());
                     }
+
                     context.SaveChanges();
                 }
 
@@ -141,6 +142,7 @@ namespace IdentityProvider
                     {
                         context.ApiScopes.Add(scope.ToEntity());
                     }
+
                     context.SaveChanges();
                 }
 
@@ -150,6 +152,7 @@ namespace IdentityProvider
                     {
                         context.ApiResources.Add(resource.ToEntity());
                     }
+
                     context.SaveChanges();
                 }
 
