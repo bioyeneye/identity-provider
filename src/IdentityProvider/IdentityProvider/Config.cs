@@ -43,7 +43,8 @@ namespace IdentityProvider
                         IdentityServerConstants.StandardScopes.Email,
                         IdentityServerConstants.StandardScopes.OfflineAccess,
                         "api1.read", "api1.write"
-                    }
+                    },
+                    
                 }
             };
         }

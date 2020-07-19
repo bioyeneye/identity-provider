@@ -8,6 +8,7 @@ using IdentityProvider.Models;
 using IdentityProvider.Services.User;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -20,6 +21,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace IdentityProvider
 {
@@ -74,6 +77,45 @@ namespace IdentityProvider
 
             // ASP.NET Identity integration
             ids.AddAspNetIdentity<IdentityUser>();
+            
+            // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //     .AddIdentityServerAuthentication(JwtBearerDefaults.AuthenticationScheme, options =>
+            //     {
+            //         options.ApiName = "api1";
+            //         options.Authority = "https://localhost:5001";
+            //     });
+            
+            IList<string> validissuers = new List<string>()
+            {
+                "https://localhost:5001"
+            };
+            var configManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{validissuers.Last()}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
+            //var openidconfig = configManager.GetConfigurationAsync().Result;
+            services.AddAuthentication(o =>
+            {
+                o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                o.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Audience = "api1";
+                options.Authority = "https://localhost:5001";
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateAudience = true,
+                    ValidAudience = "api1",
+
+                    ValidateIssuer = true,
+                    ValidIssuers = new[] { "https://localhost:5001" },
+
+                    //ValidateIssuerSigningKey = true,
+                    //IssuerSigningKeys = openidconfig.SigningKeys,
+
+                    RequireExpirationTime = true,
+                    ValidateLifetime = true,
+                    RequireSignedTokens = true,
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -102,6 +144,7 @@ namespace IdentityProvider
             app.UseRouting();
 
             app.UseIdentityServer();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
