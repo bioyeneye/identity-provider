@@ -3,12 +3,11 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using IdentityModel;
-using IdentityServer4.AspNetIdentity;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 
-namespace IdentityProvider.Services.User
+namespace IdentityProvider.Services.Authentication
 {
     public class CustomProfileService : IProfileService
     {

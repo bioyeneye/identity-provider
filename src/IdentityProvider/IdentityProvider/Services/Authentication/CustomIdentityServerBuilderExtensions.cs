@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace IdentityProvider.Services.User
+namespace IdentityProvider.Services.Authentication
 {
     public static class CustomIdentityServerBuilderExtensions
     {

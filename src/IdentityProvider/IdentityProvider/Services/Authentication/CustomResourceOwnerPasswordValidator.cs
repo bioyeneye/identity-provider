@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using IdentityServer4.Models;
 using IdentityServer4.Validation;
 
-namespace IdentityProvider.Services.User
+namespace IdentityProvider.Services.Authentication
 {
     public class CustomResourceOwnerPasswordValidator : IResourceOwnerPasswordValidator
     {

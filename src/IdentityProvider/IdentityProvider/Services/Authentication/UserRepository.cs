@@ -1,14 +1,9 @@
-using System;
-using System.Security.Claims;
-using System.Security.Policy;
 using System.Threading.Tasks;
 using IdentityServer4.Events;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
-namespace IdentityProvider.Services.User
+namespace IdentityProvider.Services.Authentication
 {
     public interface IUserRepository
     {
