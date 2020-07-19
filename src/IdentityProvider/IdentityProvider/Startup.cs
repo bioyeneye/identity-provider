@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using IdentityProvider.Models;
+using IdentityProvider.Services.Authorization;
 using IdentityProvider.Services.User;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
@@ -47,8 +48,8 @@ namespace IdentityProvider
             var connectionString = Configuration.GetConnectionString("IdentityDbContext");
             var migrationsAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
 
-            services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer(connectionString, sqlOptions => sqlOptions.MigrationsAssembly(migrationsAssembly)));
-            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            services.AddDbContext<ApplicationDbContext>(builder => builder.UseSqlServer(connectionString, sqlOptions => sqlOptions.MigrationsAssembly(migrationsAssembly)))
+                .AddIdentity<IdentityUser, IdentityRole>(options =>
                 {
                     options.Password.RequireDigit = true;
                     options.Password.RequiredLength = 8;
@@ -62,6 +63,8 @@ namespace IdentityProvider
                 .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            //for authorization implementation
+            services.AddIdentityAuthorizationService();
 
             IIdentityServerBuilder ids = services.AddIdentityServer()
                 .AddCustomUserStore()
@@ -77,14 +80,6 @@ namespace IdentityProvider
 
             // ASP.NET Identity integration
             ids.AddAspNetIdentity<IdentityUser>();
-            
-            // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //     .AddIdentityServerAuthentication(JwtBearerDefaults.AuthenticationScheme, options =>
-            //     {
-            //         options.ApiName = "api1";
-            //         options.Authority = "https://localhost:5001";
-            //     });
-            
             IList<string> validissuers = new List<string>()
             {
                 "https://localhost:5001"
@@ -106,7 +101,7 @@ namespace IdentityProvider
                     ValidAudience = "api1",
 
                     ValidateIssuer = true,
-                    ValidIssuers = new[] { "https://localhost:5001" },
+                    ValidIssuers = new[] {"https://localhost:5001"},
 
                     //ValidateIssuerSigningKey = true,
                     //IssuerSigningKeys = openidconfig.SigningKeys,
