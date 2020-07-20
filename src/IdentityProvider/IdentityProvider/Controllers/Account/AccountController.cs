@@ -35,7 +35,5 @@ namespace IdentityProvider.Controllers.Account
             _events = events;
             _signInManager = signInManager;
         }
-        
-        
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityProvider.Services.Authorization.Abstracts;
 using IdentityProvider.Services.Authorization.Request;
 using IdentityProvider.Services.Authorization.Response;
 using IdentityServer4.EntityFramework.DbContexts;
@@ -13,41 +14,35 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityProvider.Services.Authorization
 {
-    public class AuthorizationService : IAuthorizationService
+    public class IdentityApiResourceService : IIdentityApiResourceService
     {
         private IServiceProvider ServiceProvider { get; set; }
         private ConfigurationDbContext ConfigurationDbContext { get; set; }
 
-        public AuthorizationService(IServiceProvider serviceProvider)
+        public IdentityApiResourceService(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
             ConfigurationDbContext = ServiceProvider.GetRequiredService<ConfigurationDbContext>();
         }
-
-
-        public Task<ClientResponse> CreateClient()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public async Task<bool> ClientNameExistAsync(string name)
-        {
-            var client = await ConfigurationDbContext.Clients.FirstOrDefaultAsync(c => c.ClientName.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            return client != null;
-        }
-
+        
+        
         public async Task<CreateApiResourceResponse> GetApiResourceByName(string name)
         {
-            var apiResource = await ConfigurationDbContext.ApiResources.FirstOrDefaultAsync(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            return apiResource == null
-                ? default
-                : new CreateApiResourceResponse
+            try
+            {
+                var apiResource = await ConfigurationDbContext.ApiResources.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
+                return new CreateApiResourceResponse
                 {
-                    Name = apiResource.Name,
-                    DisplayName = apiResource.DisplayName,
-                    Description = apiResource.Description,
-                    Scopes = apiResource.Scopes.Select(c => c.Scope).ToList().Join(", ")
+                    Name = apiResource?.Name,
+                    DisplayName = apiResource?.DisplayName,
+                    Description = apiResource?.Description,
+                    Scopes = apiResource?.Scopes?.Select(c => c.Scope).ToList().Join(", ")
                 };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public async Task<List<CreateApiResourceResponse>> GetApiResources()
@@ -92,7 +87,7 @@ namespace IdentityProvider.Services.Authorization
             List<string> claims = string.IsNullOrWhiteSpace(request.Claims)
                 ? new List<string>()
                 : request.Claims.Split(",").ToList();
-            
+
             return new ApiResource
             {
                 Name = request.Name,

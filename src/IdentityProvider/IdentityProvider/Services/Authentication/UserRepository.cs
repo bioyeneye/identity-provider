@@ -50,12 +50,7 @@ namespace IdentityProvider.Services.Authentication
 
         public async Task<bool> ValidatePassword(IdentityUser user, string password)
         {
-            if (user != null && await _userManager.CheckPasswordAsync(user, password))
-            {
-                return true;
-            }
-            
-            return false;
+            return user != null && await _userManager.CheckPasswordAsync(user, password);
         }
     }
 }

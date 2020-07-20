@@ -1,3 +1,4 @@
+using IdentityProvider.Services.Authorization.Abstracts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IdentityProvider.Services.Authorization
@@ -6,7 +7,7 @@ namespace IdentityProvider.Services.Authorization
     {
         public static IServiceCollection AddIdentityAuthorizationService(this IServiceCollection service)
         {
-            service.AddTransient<IAuthorizationService, AuthorizationService>();
+            service.AddTransient<IIdentityClientService, IdentityClientService>();
             return service;
         }
     }

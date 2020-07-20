@@ -37,9 +37,11 @@ namespace IdentityProvider
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public async void ConfigureServices(IServiceCollection services)
         {
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+            
+            //todo: check use online
             IdentityModelEventSource.ShowPII = true;
 
             services.AddControllers();
@@ -80,12 +82,16 @@ namespace IdentityProvider
 
             // ASP.NET Identity integration
             ids.AddAspNetIdentity<IdentityUser>();
+            
+            
             IList<string> validissuers = new List<string>()
             {
                 "https://localhost:5001"
             };
+            
             var configManager = new ConfigurationManager<OpenIdConnectConfiguration>($"{validissuers.Last()}/.well-known/openid-configuration", new OpenIdConnectConfigurationRetriever());
-            //var openidconfig = configManager.GetConfigurationAsync().Result;
+            //var openidconfig = await configManager.GetConfigurationAsync();
+            
             services.AddAuthentication(o =>
             {
                 o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -99,13 +105,13 @@ namespace IdentityProvider
                 {
                     ValidateAudience = true,
                     ValidAudience = "api1",
-
+                
                     ValidateIssuer = true,
                     ValidIssuers = new[] {"https://localhost:5001"},
-
+                
                     //ValidateIssuerSigningKey = true,
                     //IssuerSigningKeys = openidconfig.SigningKeys,
-
+                
                     RequireExpirationTime = true,
                     ValidateLifetime = true,
                     RequireSignedTokens = true,

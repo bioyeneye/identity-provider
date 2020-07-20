@@ -1,14 +1,22 @@
+using System;
+using System.Threading.Tasks;
+using IdentityProvider.Services.Authorization;
+using IdentityProvider.Services.Authorization.Abstracts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityProvider.Controllers.Account
 {
-    public class AuthorizationController : Controller
+    [Route("api/[controller]")]
+    public class AuthorizationController : ControllerBase
     {
-        
-        // GET
-        public string Index()
+        private IIdentityClientService _authorizationService;
+
+        public AuthorizationController(IIdentityClientService authorizationService)
         {
-            return "";
+            _authorizationService = authorizationService;
         }
+
+        
     }
 }
